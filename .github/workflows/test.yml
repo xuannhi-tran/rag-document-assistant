@@ -48,4 +48,5 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PYTHONPATH: ${{ github.workspace }}
+          DATABASE_URL: postgresql://admin:admin123@localhost:5433/ragdb_test
         run: pytest
