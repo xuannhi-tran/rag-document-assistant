@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          path: app
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -35,13 +37,14 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r app/requirements.txt
 
       - name: Enable pgvector extension
         run: |
           PGPASSWORD=admin123 psql -h localhost -p 5433 -U admin -d ragdb_test -c "CREATE EXTENSION vector;"
 
       - name: Run tests
+        working-directory: .
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: pytest
