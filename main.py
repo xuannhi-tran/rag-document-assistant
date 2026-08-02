@@ -12,7 +12,10 @@ app.include_router(upload_router)
 app.include_router(ask_router)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://rag-frontend-lilac.vercel.app"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://rag-frontend-lilac.vercel.app",
+    ],
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
