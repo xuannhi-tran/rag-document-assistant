@@ -10,6 +10,7 @@ class Document(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     filename = Column(String, nullable=False)
+    summary = Column(String, nullable=True)
     upload_date = Column(DateTime, nullable=False, server_default = func.now())
     content_type = Column(String, nullable=False)
 

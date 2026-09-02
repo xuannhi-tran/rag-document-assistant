@@ -30,7 +30,7 @@ async def upload_document(
 
     # Process the PDF
     try:
-        process_pdf(str(temp_file_path), db)
+        doc = process_pdf(str(temp_file_path), db)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
     finally:
@@ -38,4 +38,9 @@ async def upload_document(
         temp_file_path.unlink(missing_ok=True)
 
     # Return response
-    return {"filename": file.filename, "status": "processed"}
+    return {
+        "filename": file.filename,
+        "document_id": doc.id if doc else None,
+        "summary": doc.summary if doc else None,
+        "status": "processed"
+    }
