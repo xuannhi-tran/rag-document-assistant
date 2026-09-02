@@ -21,4 +21,10 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
+)
+
+@app.on_event("startup")
+def startup_event():
+    from app.services.embedding import get_model
+    get_model()
+
