@@ -1,23 +1,39 @@
-from unittest.mock import patch
-from app.main import app
 from pathlib import Path
-
+from unittest.mock import patch
 
 
 def test_ask_endpoint(client):
     sample_pdf_path = Path(__file__).parent / "fixtures" / "sample.pdf"
-    # Step 1: Upload a sample PDF file
-    with open(sample_pdf_path,"rb") as pdf_file:
-        response = client.post("/upload/", files={"file": pdf_file})
+
+    with (
+        patch(
+            "app.services.ingestion.generate_document_summary",
+            return_value="Test summary",
+        ),
+        patch(
+            "app.services.ingestion.generate_embeddings_batch",
+            side_effect=lambda texts: [[0.0] * 384 for _ in texts],
+        ),
+    ):
+        with open(sample_pdf_path, "rb") as pdf_file:
+            response = client.post(
+                "/upload/",
+                files={"file": ("sample.pdf", pdf_file, "application/pdf")},
+            )
+
     assert response.status_code == 200
 
-    # Step 2: Mock the generate_answer function
-    with patch("app.routes.ask.generate_answer") as mock_generate:
-        mock_generate.return_value = "random answer"
+    with (
+        patch(
+            "app.services.retrieval.generate_embedding",
+            return_value=[0.0] * 384,
+        ),
+        patch("app.routes.ask.generate_answer", return_value="random answer"),
+    ):
+        response = client.post(
+            "/ask",
+            json={"question": "What is the content of the sample PDF?"},
+        )
 
-        # Step 3: Call the /ask endpoint with a question
-        response = client.post("/ask", json={"question": "What is the content of the sample PDF?"})
-        
-        # Step 4: Assert the response
-        assert response.status_code == 200
-        assert response.json()["answer"] == "random answer"
+    assert response.status_code == 200
+    assert response.json()["answer"] == "random answer"

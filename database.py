@@ -1,25 +1,21 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
-from pathlib import Path
-from sqlalchemy.orm import declarative_base
 import os
+from pathlib import Path
 
-# Load environment variables from .env file
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
-# Construct the database URL
+
 DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not configured")
 
-# Create the database engine
 engine = create_engine(DATABASE_URL)
-
-# Create a session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-#Create a base
 Base = declarative_base()
 
-# Example function to get a database session
+
 def get_db():
     db = SessionLocal()
     try:

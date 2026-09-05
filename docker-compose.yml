@@ -1,24 +1,24 @@
-services: 
+services:
   db:
     image: pgvector/pgvector:pg16
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin123
-      - POSTGRES_DB=ragdb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-  
+
   test-db:
     image: pgvector/pgvector:pg16
     environment:
-      - POSTGRES_DB=ragdb_test
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin123
+      POSTGRES_USER: ${TEST_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${TEST_POSTGRES_DB}
     ports:
       - "5433:5432"
-  
+
   web:
     build: .
     ports:
@@ -26,6 +26,6 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://admin:admin123@db:5432/ragdb
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     depends_on:
       - db

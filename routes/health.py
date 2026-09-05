@@ -1,15 +1,19 @@
-from fastapi import APIRouter
-from app.database import get_db
-from fastapi import Depends
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 
-router  = APIRouter()
+from app.database import get_db
+
+router = APIRouter()
+logger = logging.getLogger(__name__)
+
 
 @router.get("/health")
 async def health_check(db=Depends(get_db)):
     try:
-        db.execute(text("SELECT 1"))  # Simple query to test the connection
+        db.execute(text("SELECT 1"))
         return {"status": "healthy"}
-    except Exception as e:
-        return {"status": "unhealthy", "error": str(e)}
-
+    except Exception:
+        logger.exception("Health check failed")
+        raise HTTPException(status_code=503, detail="Database unavailable")
