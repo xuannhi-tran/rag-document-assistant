@@ -5,12 +5,20 @@ from google import genai
 
 load_dotenv()
 
+_client: genai.Client | None = None
+
 
 def get_client() -> genai.Client:
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY is not configured")
-    return genai.Client(api_key=api_key)
+    """Create one long-lived Gemini client after configuration is available."""
+    global _client
+
+    if _client is None:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise RuntimeError("GEMINI_API_KEY is not configured")
+        _client = genai.Client(api_key=api_key)
+
+    return _client
 
 
 def generate_document_summary(full_text: str) -> str:
