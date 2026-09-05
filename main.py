@@ -1,30 +1,34 @@
+import os
+
 from fastapi import FastAPI
-from app.routes.health import router as health_router
-from app.routes.upload import router as upload_router
-from app.routes.ask import router as ask_router
-import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+from app.routes.ask import router as ask_router
+from app.routes.health import router as health_router
+from app.routes.upload import router as upload_router
 
-app.include_router(health_router)
-app.include_router(upload_router)
-app.include_router(ask_router)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+DEFAULT_CORS_ORIGINS = ",".join(
+    [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "https://rag-frontend-lilac.vercel.app",
-        "*"
-    ],
-    allow_credentials=True,
+    ]
+)
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", DEFAULT_CORS_ORIGINS).split(",")
+    if origin.strip()
+]
+
+app = FastAPI()
+app.include_router(health_router)
+app.include_router(upload_router)
+app.include_router(ask_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.on_event("startup")
-def startup_event():
-    from app.services.embedding import get_model
-    get_model()
-
