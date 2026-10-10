@@ -27,23 +27,23 @@ A multilingual FastAPI backend for uploading PDF documents and asking questions 
 
 ## Tech stack
 
-| Area | Technology |
-| --- | --- |
-| API | Python 3.12, FastAPI, Uvicorn |
-| PDF processing | pypdf |
-| Embeddings | sentence-transformers, `paraphrase-multilingual-MiniLM-L12-v2` |
-| Vector database | PostgreSQL 16, pgvector, SQLAlchemy |
-| Generative model | Google Gemini (`gemini-flash-lite-latest`) |
-| Testing | pytest, FastAPI TestClient |
-| Containers / CI | Docker, Docker Compose, GitHub Actions |
+| Area             | Technology                                                     |
+| ---------------- | -------------------------------------------------------------- |
+| API              | Python 3.12, FastAPI, Uvicorn                                  |
+| PDF processing   | pypdf                                                          |
+| Embeddings       | sentence-transformers, `paraphrase-multilingual-MiniLM-L12-v2` |
+| Vector database  | PostgreSQL 16, pgvector, SQLAlchemy                            |
+| Generative model | Google Gemini (`gemini-flash-lite-latest`)                     |
+| Testing          | pytest, FastAPI TestClient                                     |
+| Containers / CI  | Docker, Docker Compose, GitHub Actions                         |
 
 ## API endpoints
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/health` | Check database connectivity |
-| `POST` | `/upload/` | Upload and index a PDF |
-| `POST` | `/ask` | Ask a question about uploaded documents |
+| Method | Endpoint   | Purpose                                 |
+| ------ | ---------- | --------------------------------------- |
+| `GET`  | `/health`  | Check database connectivity             |
+| `POST` | `/upload/` | Upload and index a PDF                  |
+| `POST` | `/ask`     | Ask a question about uploaded documents |
 
 ### Upload a document
 
@@ -86,7 +86,7 @@ TEST_POSTGRES_DB=ragdb_test
 TEST_DATABASE_URL=postgresql://rag_test_user:choose_a_different_test_password@localhost:5433/ragdb_test
 ```
 
-Start from `.env.example`; it also documents the optional `CORS_ORIGINS` setting. `DATABASE_URL` is assembled for the API container by `docker-compose.yml`.
+Start from `.env.example`; it also documents the optional `ALLOWED_ORIGINS` setting. `DATABASE_URL` is assembled for the API container by `docker-compose.yml`.
 
 ### 2. Start the API and database
 
