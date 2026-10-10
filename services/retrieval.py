@@ -44,38 +44,37 @@ def is_summary_query(question: str) -> bool:
 
 
 
-def get_latest_document_summary(db_session, document_id=None) -> str | None:
-    """
-    Retrieves the precomputed summary of the specified or most recently uploaded document.
-    """
-    if document_id:
-        doc = db_session.query(Document).filter(Document.id == document_id).first()
-    else:
-        doc = db_session.query(Document).order_by(Document.id.desc()).first()
-
-    if doc and doc.summary:
-        return doc.summary
-    return None
+def get_document_summary(db_session, session_id: str, document_id: int) -> str | None:
+    """Precomputed summary of a document, only if it belongs to the session."""
+    doc = (
+        db_session.query(Document)
+        .filter(Document.id == document_id, Document.session_id == session_id)
+        .first()
+    )
+    return doc.summary if doc and doc.summary else None
 
 
-def retrieve_chunks(question, db_session, top_k=8, document_id=None, document_ids=None):
-    # Generate embedding for the question
+def retrieve_chunks(question, db_session, session_id: str, top_k=8, document_ids=None):
+    """Vector search restricted to one session's chunks. session_id is mandatory
+    and always applied; document_ids can only narrow the result further."""
+    if not session_id:
+        raise ValueError("session_id is required")
     question_embedding = generate_embedding(question)
-    
-    query = db_session.query(Chunk, Document.filename).join(Document, Chunk.document_id == Document.id)
-    if document_id:
-        query = query.filter(Chunk.document_id == document_id)
-    elif document_ids:
+
+    query = (
+        db_session.query(Chunk, Document.filename)
+        .join(Document, Chunk.document_id == Document.id)
+        .filter(Chunk.session_id == session_id, Document.session_id == session_id)
+    )
+    if document_ids:
         query = query.filter(Chunk.document_id.in_(document_ids))
-        
+
     results = (
         query
         .order_by(Chunk.embedding.cosine_distance(question_embedding))
         .limit(top_k)
         .all()
     )
-    
+
     # Return context chunks with source document attribution
     return [f"[Nguồn / Source Document: {filename}]\n{chunk.content}" for chunk, filename in results]
-
-

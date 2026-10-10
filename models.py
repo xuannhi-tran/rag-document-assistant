@@ -13,14 +13,19 @@ class Document(Base):
     summary = Column(String, nullable=True)
     upload_date = Column(DateTime, nullable=False, server_default = func.now())
     content_type = Column(String, nullable=False)
+    size_bytes = Column(Integer, nullable=True)
+    # Browser-generated random id. NULL = legacy row from before sessions existed;
+    # such rows never match any session and are removed by app/purge.py.
+    session_id = Column(String(36), nullable=True, index=True)
 
-    chunks = relationship("Chunk", back_populates="document")
+    chunks = relationship("Chunk", back_populates="document", cascade="all, delete-orphan")
 
 class Chunk(Base):
     __tablename__ = 'chunks'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    document_id = Column(Integer, ForeignKey('documents.id'), nullable=False)
+    document_id = Column(Integer, ForeignKey('documents.id', ondelete='CASCADE'), nullable=False, index=True)
+    session_id = Column(String(36), nullable=True, index=True)
     content = Column(String, nullable=False)
     embedding = Column(Vector(384), nullable=False)
 
