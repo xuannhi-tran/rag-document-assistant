@@ -4,6 +4,9 @@ A multilingual FastAPI backend for uploading PDF documents and asking questions 
 
 > This repository contains the backend API. The frontend is deployed separately.
 
+<img width="1919" height="948" alt="image" src="https://github.com/user-attachments/assets/b082af99-4e52-42ce-824e-53fdcc139207" />
+
+
 ## Features
 
 - Upload PDF documents through a REST API
